@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: report
+  namespace: siren
   labels:
     app: report
 spec:
@@ -14,11 +15,18 @@ spec:
       labels:
         app: report
     spec:
+      #volumes:
+      #  - name: persistent-storage
+      #    persistentVolumeClaim:
+      #      claimName: efs-claim
       containers:
         - name: report
-          image: username/report:latest
+          image: 740569282574.dkr.ecr.ap-northeast-2.amazonaws.com/report:v5
           ports:
             - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: report-config
           readinessProbe:
             httpGet:
               path: '/actuator/health'
@@ -35,3 +43,6 @@ spec:
             timeoutSeconds: 2
             periodSeconds: 5
             failureThreshold: 5
+          #volumeMounts:
+          #  - name: persistent-storage
+          #    mountPath: /data
